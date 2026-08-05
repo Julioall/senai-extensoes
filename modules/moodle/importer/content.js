@@ -40,18 +40,35 @@
 
   function pageSupported() {
     const url = new URL(location.href);
-    return /\/mod\/assign\/view\.php$/.test(url.pathname) && url.searchParams.get('action') === 'grading';
+    const gradingAction = url.searchParams.get('action') === 'grading';
+    const gradingTable = Boolean(document.querySelector('#submissions'));
+    return /\/mod\/assign\/view\.php$/.test(url.pathname) && (gradingAction || gradingTable);
+  }
+
+  function quickGradingCheckbox() {
+    const direct = document.querySelector(
+      'input[type="checkbox"][name="quickgrading"],input[type="checkbox"][id^="quickgrading"],input[type="checkbox"][id*="quickgrading"]'
+    );
+    if (direct) return direct;
+    const label = [...document.querySelectorAll('label')]
+      .find(item => normalizeText(item.textContent) === 'avaliacao rapida');
+    return label?.htmlFor ? document.getElementById(label.htmlFor) : null;
   }
 
   function findRows() {
-    const table = document.querySelector('#submissions');
+    const table = document.querySelector('#submissions, table[data-region="grading-table"]');
     if (!table) return [];
-    return [...table.querySelectorAll('tbody tr')].map(row => {
-      const nameElement = row.querySelector('a.username, td.user a, th.user a, [data-region="user-name"]');
+    return [...table.querySelectorAll('tbody tr, tr[data-region="student-row"]')].map(row => {
+      const nameElement = row.querySelector(
+        'a.username, a[href*="/user/view.php"], a[href*="/user/profile.php"], td.user a, th.user a, [data-region="user-name"], .fullname'
+      );
       const name = String(nameElement?.textContent || '').replace(/\s+/g, ' ').trim();
-      const grade = [...row.querySelectorAll('input[id^="quickgrade_"],input[name^="quickgrade_"]')]
-        .find(input => !/comments/i.test(`${input.id} ${input.name}`));
-      const feedback = row.querySelector('textarea[id^="quickgrade_comments_"],textarea[name^="quickgrade_comments_"]');
+      const grade = [...row.querySelectorAll(
+        'input.quickgrade[id^="quickgrade_"],input.quickgrade[name^="quickgrade_"],input[id^="quickgrade_"],input[name^="quickgrade_"]'
+      )].find(input => !/comments/i.test(`${input.id} ${input.name}`));
+      const feedback = row.querySelector(
+        'textarea.quickgrade[id^="quickgrade_comments_"],textarea.quickgrade[name^="quickgrade_comments_"],textarea[id^="quickgrade_comments_"],textarea[name^="quickgrade_comments_"]'
+      );
       const submissionText = String(row.textContent || '').toLowerCase();
       const hasSubmission = !submissionText.includes('nenhum envio') && !submissionText.includes('no submission');
       return { row, name, grade, feedback, hasSubmission };
@@ -59,23 +76,74 @@
   }
 
   function quickGradingEnabled() {
-    const checkbox = document.querySelector('input[type="checkbox"][name="quickgrading"],input[type="checkbox"][id*="quickgrading"]');
+    const checkbox = quickGradingCheckbox();
     return !checkbox || checkbox.checked;
   }
 
-  function ensureButton() {
-    if (!pageSupported() || document.getElementById('sx-importer-open')) return;
-    const rows = findRows();
-    if (!rows.length || !quickGradingEnabled()) return;
+  function showPageToast(message, tone = 'warning') {
+    document.getElementById('sx-importer-toast')?.remove();
+    const toast = document.createElement('div');
+    toast.id = 'sx-importer-toast';
+    toast.className = `sx-importer-toast sx-reset is-${tone}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 6000);
+  }
 
-    const host = document.querySelector('[data-region="grading-actions"], .tertiary-navigation .navitem:last-child, #region-main .boxaligncenter') || document.body;
-    const button = document.createElement('button');
-    button.id = 'sx-importer-open';
-    button.type = 'button';
-    button.className = 'sx-importer-open sx-button sx-reset';
-    button.textContent = 'Importar correções';
-    button.addEventListener('click', openModal);
-    host.appendChild(button);
+  function detectDecimalSeparator() {
+    const values = findRows().map(item => item.grade?.value || '').join(' ');
+    if (/\d,\d/.test(values)) return ',';
+    const gradeText = [...document.querySelectorAll('td.grade,th.grade,td[class*="grade"],th[class*="grade"]')]
+      .map(cell => cell.textContent || '').join(' ');
+    return /\d,\d/.test(gradeText) ? ',' : '.';
+  }
+
+  function gradeForPage(value) {
+    let grade = String(value ?? '').trim().replace(/^['"]|['"]$/g, '').replace(/\s*\/\s*.+$/, '');
+    grade = grade.replace(/[^0-9,.-]/g, '');
+    if (!grade) return '';
+    const separator = detectDecimalSeparator();
+    if (separator === ',') {
+      if (grade.includes(',') && grade.includes('.')) grade = grade.replace(/\./g, '');
+      else if (grade.includes('.') && !grade.includes(',')) grade = grade.replace('.', ',');
+    } else {
+      if (grade.includes(',') && grade.includes('.')) grade = grade.replace(/,/g, '');
+      else if (grade.includes(',') && !grade.includes('.')) grade = grade.replace(',', '.');
+    }
+    return grade;
+  }
+
+  function ensureButton() {
+    if (!pageSupported()) return;
+    let button = document.getElementById('sx-importer-open');
+    if (!button) {
+      button = document.createElement('button');
+      button.id = 'sx-importer-open';
+      button.type = 'button';
+      button.className = 'sx-importer-open sx-button sx-reset';
+      button.textContent = 'Importar correções';
+      button.addEventListener('click', () => {
+        const checkbox = quickGradingCheckbox();
+        if (checkbox && !checkbox.checked) {
+          checkbox.click();
+          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          showPageToast('A avaliação rápida foi ativada. Aguarde o Moodle atualizar os campos e clique novamente em Importar correções.');
+          return;
+        }
+        const rows = findRows();
+        if (!rows.length) {
+          showPageToast('Os campos de nota e feedback ainda não estão disponíveis. Marque Avaliação rápida e aguarde a tabela carregar.');
+          return;
+        }
+        openModal();
+      });
+      document.body.appendChild(button);
+    }
+    const rows = findRows();
+    button.dataset.ready = rows.length && quickGradingEnabled() ? 'true' : 'false';
+    button.title = rows.length
+      ? 'Importar notas e feedbacks para a página atual'
+      : 'Clique para ativar ou aguardar a avaliação rápida';
   }
 
   function resetFlow() {
@@ -246,7 +314,7 @@
       let changed = false;
       if (record.nota && target.grade) {
         if (state.settings.moodle.overwriteGrades || !String(target.grade.value || '').trim()) {
-          setNativeValue(target.grade, String(record.nota).replace(',', '.'));
+          setNativeValue(target.grade, gradeForPage(record.nota));
           changed = true;
         }
       }
@@ -311,7 +379,7 @@
       }
       let applied = 0;
       findRows().filter(item => scope === 'all' || item.hasSubmission).forEach(item => {
-        if (grade && item.grade && (state.settings.moodle.overwriteGrades || !item.grade.value.trim())) setNativeValue(item.grade, grade.replace(',', '.'));
+        if (grade && item.grade && (state.settings.moodle.overwriteGrades || !item.grade.value.trim())) setNativeValue(item.grade, gradeForPage(grade));
         if (feedback && item.feedback && (state.settings.moodle.overwriteFeedback || !item.feedback.value.trim())) setNativeValue(item.feedback, feedback);
         applied += 1;
       });
