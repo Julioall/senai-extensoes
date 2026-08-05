@@ -1,0 +1,49 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; min-width: 390px; background: var(--sx-bg); color: var(--sx-text); font-family: var(--sx-font); }
+body { width: 390px; max-height: 620px; overflow: hidden; }
+button, input, select { font: inherit; }
+.app { padding: 8px; }
+.shell { max-height: 604px; overflow: hidden; border-radius: 16px; box-shadow: 0 8px 28px rgba(20, 30, 45, .15); }
+.header { position: relative; display: flex; align-items: flex-start; gap: 10px; padding: 20px 20px 15px; }
+.header-copy { flex: 1; min-width: 0; }
+.header h1 { margin: 0; font-size: 21px; line-height: 1.2; }
+.header p { margin: 4px 0 0; color: var(--sx-muted); font-size: 12px; line-height: 1.35; }
+.close-button, .back-button { width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: #333b45; cursor: pointer; font-size: 25px; line-height: 1; }
+.close-button:hover, .back-button:hover { background: var(--sx-surface-soft); }
+.back-button { font-size: 30px; }
+.content { max-height: 470px; padding: 5px 20px 18px; overflow-y: auto; scrollbar-width: thin; }
+.section + .section { margin-top: 22px; }
+.nav-row, .info-row, .setting-row, .field-row { width: 100%; min-height: 68px; display: flex; align-items: center; gap: 12px; border: 0; border-top: 1px solid var(--sx-border); background: transparent; color: inherit; text-align: left; }
+.nav-row { cursor: pointer; padding: 0; }
+.nav-row:first-of-type, .info-row:first-of-type, .setting-row:first-of-type { border-top: 0; }
+.nav-row:hover { background: linear-gradient(90deg, transparent, #f7faff); }
+.row-icon { width: 40px; height: 40px; display: inline-grid; place-items: center; flex: 0 0 40px; border: 1px solid var(--sx-border); border-radius: 11px; background: #fff; color: #344054; font-size: 14px; font-weight: 800; box-shadow: 0 2px 5px rgba(15, 23, 42, .05); }
+.row-icon--blue { color: #1769e0; background: #f4f8ff; }
+.row-icon--green { color: #159455; background: #f1fbf5; }
+.row-icon--purple { color: #7c3aed; background: #f8f4ff; }
+.row-icon--orange { color: #d97706; background: #fff8eb; }
+.row-copy { flex: 1; min-width: 0; }
+.row-copy strong, .row-copy small { display: block; }
+.row-copy strong { font-size: 14px; font-weight: 650; line-height: 1.25; }
+.row-copy small { margin-top: 3px; color: var(--sx-muted); font-size: 11px; line-height: 1.35; }
+.row-switch, .toggle { position: relative; width: 47px; height: 28px; flex: 0 0 47px; border-radius: 999px; background: #cfd5dc; transition: .18s ease; }
+.row-switch::after, .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.18); transition: .18s ease; }
+.row-switch.is-on, .setting-row input:checked + .toggle { background: var(--sx-primary); }
+.row-switch.is-on::after, .setting-row input:checked + .toggle::after { transform: translateX(19px); }
+.setting-row { cursor: pointer; }
+.setting-row input { position: absolute; opacity: 0; pointer-events: none; }
+.field-row { justify-content: space-between; }
+.field-row strong, .field-row small { display: block; }
+.field-row strong { font-size: 13px; }
+.field-row small { margin-top: 3px; color: var(--sx-muted); font-size: 11px; }
+.select { min-height: 36px; padding: 0 9px; border: 1px solid var(--sx-border); border-radius: 9px; background: white; color: var(--sx-text); font-size: 12px; }
+.description-card { margin-bottom: 10px; padding: 13px 14px; border: 1px solid #dce7f8; border-radius: 12px; background: #f7faff; }
+.description-card strong { font-size: 13px; }
+.description-card p { margin: 5px 0 0; color: var(--sx-muted); font-size: 11px; line-height: 1.5; }
+.status { min-height: 18px; margin: 0; padding: 0 20px 10px; color: var(--sx-success); font-size: 10px; }
+.status.is-error { color: var(--sx-danger); }
+.footer { border-top: 1px solid var(--sx-border); }
+.footer button { width: 100%; min-height: 66px; display: flex; align-items: center; gap: 12px; padding: 0 20px; border: 0; background: white; color: var(--sx-text); cursor: pointer; text-align: left; }
+.footer button:hover { background: var(--sx-surface-soft); }
+.footer button > span:nth-child(2) { flex: 1; font-size: 14px; font-weight: 600; }
+.chevron { font-size: 25px; color: var(--sx-muted); }

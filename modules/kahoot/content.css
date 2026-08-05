@@ -1,0 +1,21 @@
+.sx-kahoot-open { position: fixed !important; z-index: 99998 !important; right: 22px !important; bottom: 22px !important; display: inline-flex !important; align-items: center !important; gap: 8px !important; min-height: 44px !important; background: #6c36c9 !important; box-shadow: 0 8px 24px rgba(70, 30, 130, .28) !important; }
+.sx-kahoot-open:hover { background: #5928ad !important; }
+.sx-kahoot-open span { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 7px; background: rgba(255,255,255,.18); font-size: 12px; }
+.sx-kahoot-overlay { position: fixed; inset: 0; z-index: 100000; display: grid; place-items: center; padding: 18px; background: rgba(18, 25, 35, .58); backdrop-filter: blur(2px); }
+.sx-kahoot-panel { width: min(520px, 96vw); overflow: hidden; }
+.sx-kahoot-panel header { display: flex; justify-content: space-between; gap: 15px; padding: 21px 22px 15px; border-bottom: 1px solid var(--sx-border); }
+.sx-kahoot-panel h2 { margin: 0; font-size: 19px; }
+.sx-kahoot-panel header p { margin: 4px 0 0; color: var(--sx-muted); font-size: 11px; }
+.sx-kahoot-panel header button { width: 33px; height: 33px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; font-size: 24px; }
+.sx-kahoot-panel header button:hover { background: var(--sx-surface-soft); }
+.sx-kahoot-content { display: grid; gap: 14px; padding: 20px 22px; }
+.sx-kahoot-drop { min-height: 125px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 2px dashed #bba5e8; border-radius: 14px; background: #faf7ff; cursor: pointer; text-align: center; }
+.sx-kahoot-drop:hover { background: #f4edff; }
+.sx-kahoot-drop input { position: absolute; opacity: 0; pointer-events: none; }
+.sx-kahoot-drop span { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: #6c36c9; color: white; font-size: 11px; font-weight: 800; }
+.sx-kahoot-drop strong { font-size: 13px; }
+.sx-kahoot-drop small { color: var(--sx-muted); font-size: 10px; }
+.sx-kahoot-preview { max-height: 145px; overflow-y: auto; border: 1px solid var(--sx-border); border-radius: 10px; }
+.sx-kahoot-preview div { padding: 8px 10px; border-top: 1px solid var(--sx-border); color: #505967; font-size: 11px; }
+.sx-kahoot-preview div:first-child { border-top: 0; }
+.sx-kahoot-panel footer { display: flex; justify-content: flex-end; gap: 9px; padding: 14px 20px; border-top: 1px solid var(--sx-border); background: #fbfcfd; }

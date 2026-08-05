@@ -1,0 +1,124 @@
+:root {
+  --sx-bg: #f4f6f8;
+  --sx-surface: #ffffff;
+  --sx-surface-soft: #f8fafc;
+  --sx-text: #171a1f;
+  --sx-muted: #667085;
+  --sx-border: #e3e7ec;
+  --sx-primary: #1769e0;
+  --sx-primary-hover: #1257bd;
+  --sx-success: #159455;
+  --sx-warning: #d97706;
+  --sx-danger: #c9362b;
+  --sx-shadow: 0 18px 55px rgba(25, 36, 50, .18);
+  --sx-radius: 18px;
+  --sx-radius-sm: 12px;
+  --sx-font: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.sx-reset,
+.sx-reset * {
+  box-sizing: border-box;
+  font-family: var(--sx-font);
+}
+
+.sx-panel {
+  color: var(--sx-text);
+  background: var(--sx-surface);
+  border: 1px solid var(--sx-border);
+  border-radius: var(--sx-radius);
+  box-shadow: var(--sx-shadow);
+}
+
+.sx-section-title {
+  margin: 0 0 10px;
+  color: #3f4650;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.sx-button {
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--sx-primary);
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  transition: .18s ease;
+}
+
+.sx-button:hover:not(:disabled),
+.sx-button:focus-visible:not(:disabled) {
+  background: var(--sx-primary-hover);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.sx-button--secondary {
+  border-color: var(--sx-border);
+  background: var(--sx-surface);
+  color: var(--sx-text);
+}
+
+.sx-button--secondary:hover:not(:disabled) {
+  background: var(--sx-surface-soft);
+}
+
+.sx-button--danger {
+  background: var(--sx-danger);
+}
+
+.sx-button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+.sx-field {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--sx-border);
+  border-radius: 10px;
+  background: var(--sx-surface);
+  color: var(--sx-text);
+  font-size: 13px;
+}
+
+.sx-field:focus {
+  border-color: var(--sx-primary);
+  box-shadow: 0 0 0 3px rgba(23, 105, 224, .13);
+  outline: none;
+}
+
+.sx-status {
+  padding: 11px 13px;
+  border: 1px solid #cdddf7;
+  border-radius: 10px;
+  background: #eef5ff;
+  color: #235ba5;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sx-status--success {
+  border-color: #b9e4ca;
+  background: #eefaf3;
+  color: #187346;
+}
+
+.sx-status--warning {
+  border-color: #f2d49c;
+  background: #fff8e9;
+  color: #955b08;
+}
+
+.sx-status--danger {
+  border-color: #efc3bf;
+  background: #fff1f0;
+  color: #9b3028;
+}
