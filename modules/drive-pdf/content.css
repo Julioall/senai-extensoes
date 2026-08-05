@@ -1,7 +1,7 @@
 .sx-drive-open { position: fixed !important; z-index: 99998 !important; right: 22px !important; bottom: 22px !important; display: inline-flex !important; align-items: center !important; gap: 8px !important; min-height: 44px !important; box-shadow: 0 8px 24px rgba(20, 34, 55, .24) !important; }
 .sx-drive-open span { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 7px; background: rgba(255,255,255,.18); font-size: 10px; }
 .sx-drive-overlay { position: fixed; inset: 0; z-index: 100000; display: grid; place-items: center; padding: 18px; background: rgba(18, 25, 35, .56); backdrop-filter: blur(2px); }
-.sx-drive-panel { width: min(450px, 95vw); overflow: hidden; }
+.sx-drive-panel { width: min(470px, 95vw); overflow: hidden; }
 .sx-drive-panel header { display: flex; justify-content: space-between; gap: 15px; padding: 21px 22px 15px; border-bottom: 1px solid var(--sx-border); }
 .sx-drive-panel h2 { margin: 0; font-size: 19px; }
 .sx-drive-panel header p { margin: 4px 0 0; color: var(--sx-muted); font-size: 11px; }
@@ -14,3 +14,6 @@
 .sx-drive-content label { display: flex; align-items: center; gap: 8px; color: #49515d; font-size: 12px; }
 .sx-drive-content input { accent-color: var(--sx-primary); }
 .sx-drive-panel footer { display: flex; justify-content: flex-end; gap: 9px; padding: 14px 20px; border-top: 1px solid var(--sx-border); background: #fbfcfd; }
+.sx-drive-progress { height: 8px; overflow: hidden; border-radius: 999px; background: #e9edf3; }
+.sx-drive-progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--sx-primary); transition: width .18s ease; }
+.sx-drive-progress-count { min-height: 13px; margin-top: -8px; color: var(--sx-muted); text-align: right; font-size: 10px; }
