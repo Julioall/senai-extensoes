@@ -5,7 +5,7 @@
   document.documentElement.dataset.sxPendingChecks = '1';
 
   const { getSettings, visibleText, normalizeText, downloadBlob, sleep } = SenaiExt;
-  const state = { settings: null, running: false, results: new Map() };
+  const state = { settings: null, running: false, results: new Map(), futureCourses: 0 };
 
   function pageType() {
     if (location.pathname === '/course/view.php') return 'course';
@@ -13,29 +13,82 @@
     return null;
   }
 
+  function parsePtDate(value) {
+    const match = String(value || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (!match) return null;
+    const date = new Date(Number(match[3]), Number(match[2]) - 1, Number(match[1]), 0, 0, 0, 0);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function courseStartDate(text) {
+    const source = String(text || '').replace(/\s+/g, ' ');
+    const labelled = source.match(/(?:per[ií]odo|in[ií]cio|data de in[ií]cio)\s*:?\s*(\d{1,2}\/\d{1,2}\/\d{4})/i);
+    if (labelled) return parsePtDate(labelled[1]);
+    const period = source.match(/(\d{1,2}\/\d{1,2}\/\d{4})\s*(?:a|até|-)\s*\d{1,2}\/\d{1,2}\/\d{4}/i);
+    return period ? parsePtDate(period[1]) : null;
+  }
+
+  function isFuture(date) {
+    if (!date) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date.getTime() > today.getTime();
+  }
+
   function activityLinks(root = document) {
     const seen = new Set();
     return [...root.querySelectorAll('a[href*="/mod/assign/view.php?id="]')].map(link => {
-      const url = new URL(link.href, location.origin);
+      let url;
+      try { url = new URL(link.href, location.origin); } catch { return null; }
       const id = url.searchParams.get('id');
       if (!id || seen.has(id)) return null;
       seen.add(id);
       return {
         id,
         url: `${location.origin}/mod/assign/view.php?id=${encodeURIComponent(id)}`,
-        link,
+        link: root === document ? link : null,
         name: visibleText(link) || `Atividade ${id}`
       };
     }).filter(Boolean);
   }
 
   function courseCards() {
-    return [...document.querySelectorAll('[data-course-id],.coursebox')].map(card => {
-      const link = card.querySelector('a[href*="/course/view.php?id="]');
-      if (!link) return null;
-      const url = new URL(link.href, location.origin);
-      return { id: url.searchParams.get('id'), link, card, name: visibleText(link) };
-    }).filter(item => item?.id);
+    const selectors = [
+      '.coursebox',
+      '.course-summaryitem[data-course-id]',
+      '[data-region="course-content"][data-course-id]'
+    ];
+    const seen = new Set();
+    const cards = [];
+
+    document.querySelectorAll(selectors.join(',')).forEach(card => {
+      const link = card.querySelector('a.coursename[href*="/course/view.php?id="],a[href*="/course/view.php?id="]');
+      if (!link) return;
+      let url;
+      try { url = new URL(link.href, location.origin); } catch { return; }
+      const id = card.dataset.courseId || url.searchParams.get('id');
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      const text = visibleText(card) || card.textContent || '';
+      cards.push({
+        id,
+        link,
+        card,
+        name: visibleText(link) || `Curso ${id}`,
+        startDate: courseStartDate(text)
+      });
+    });
+    return cards;
+  }
+
+  async function waitForCourseCards(timeout = 12000) {
+    const started = Date.now();
+    while (Date.now() - started < timeout) {
+      const cards = courseCards();
+      if (cards.length) return cards;
+      await sleep(200);
+    }
+    return courseCards();
   }
 
   async function fetchDoc(url) {
@@ -54,37 +107,64 @@
     });
 
     for (const label of candidates) {
-      const values = [label.nextElementSibling, label.parentElement?.querySelector('dd'), label.parentElement?.nextElementSibling]
-        .filter(Boolean)
-        .map(element => String(element.textContent || '').match(/\d+/)?.[0])
-        .filter(Boolean);
+      const values = [
+        label.nextElementSibling,
+        label.parentElement?.querySelector('dd'),
+        label.parentElement?.nextElementSibling
+      ].filter(Boolean).map(element => String(element.textContent || '').match(/\d+/)?.[0]).filter(Boolean);
       if (values.length) return Number(values[0]);
     }
 
-    const summaryText = String(doc.body?.textContent || '');
-    const fallback = summaryText.match(/(?:Precisa de avaliação|Requer avaliação|Needs grading)\s*[:\-]?\s*(\d+)/i);
-    if (fallback) return Number(fallback[1]);
-    return null;
+    const fallback = String(doc.body?.textContent || '').match(/(?:Precisa de avaliação|Requer avaliação|Needs grading)\s*[:\-]?\s*(\d+)/i);
+    return fallback ? Number(fallback[1]) : null;
   }
 
-  function badge(target, result) {
+  function activityBadge(target, result) {
+    if (!target) return;
     target.parentElement?.querySelector('.sx-pending-badge')?.remove();
-    const item = document.createElement('span');
-    item.className = 'sx-pending-badge sx-reset';
+    const badge = document.createElement('span');
+    badge.className = 'sx-pending-badge sx-reset';
     if (result.pending === null) {
-      item.classList.add('is-neutral');
-      item.textContent = '—';
-      item.title = 'Esta atividade não apresenta o campo “Precisa de avaliação”.';
+      badge.classList.add('is-neutral');
+      badge.textContent = '—';
+      badge.title = 'Esta atividade não apresenta o campo “Precisa de avaliação”.';
     } else if (result.pending > 0) {
-      item.classList.add('is-danger');
-      item.textContent = String(result.pending);
-      item.title = `${result.pending} envio(s) aguardando avaliação`;
+      badge.classList.add('is-danger');
+      badge.textContent = String(result.pending);
+      badge.title = `${result.pending} envio(s) aguardando avaliação`;
     } else {
-      item.classList.add('is-success');
-      item.textContent = '✓';
-      item.title = 'Nenhum envio aguardando avaliação';
+      badge.classList.add('is-success');
+      badge.textContent = '✓';
+      badge.title = 'Nenhum envio aguardando avaliação';
     }
-    target.insertAdjacentElement('afterend', item);
+    target.insertAdjacentElement('afterend', badge);
+  }
+
+  function courseBadge(course, data) {
+    course.card.querySelector('.sx-pending-course-badge')?.remove();
+    const badge = document.createElement('span');
+    badge.className = 'sx-pending-course-badge sx-reset';
+
+    if (data.future) {
+      badge.classList.add('is-future');
+      badge.textContent = 'Ainda não iniciado';
+      badge.title = 'Este curso foi ignorado porque a data de início ainda não chegou.';
+    } else if (data.pending > 0) {
+      badge.classList.add('is-danger');
+      badge.textContent = `${data.pending} pendente${data.pending === 1 ? '' : 's'}`;
+      badge.title = `${data.pending} envio(s) aguardando avaliação em ${data.affected} atividade(s)`;
+    } else if (data.partial) {
+      badge.classList.add('is-neutral');
+      badge.textContent = 'Consulta parcial';
+      badge.title = 'Uma ou mais atividades não exibem o campo esperado.';
+    } else {
+      badge.classList.add('is-success');
+      badge.textContent = '✓ Sem pendências';
+      badge.title = 'Nenhum envio aguardando avaliação';
+    }
+
+    const titleHost = course.card.querySelector('.coursename') || course.link;
+    titleHost.insertAdjacentElement('afterend', badge);
   }
 
   function ensureToolbar() {
@@ -131,44 +211,68 @@
     }
   }
 
+  async function mapLimit(items, limit, worker, onProgress) {
+    const results = new Array(items.length);
+    let cursor = 0;
+    async function runner() {
+      while (cursor < items.length) {
+        const index = cursor++;
+        onProgress?.(index, items.length);
+        results[index] = await worker(items[index], index);
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(limit, items.length) }, runner));
+    return results;
+  }
+
   async function inspectCourse(course) {
     try {
       const doc = await fetchDoc(`${location.origin}/course/view.php?id=${encodeURIComponent(course.id)}`);
+      const startDate = course.startDate || courseStartDate(doc.body?.textContent || '');
+      if (isFuture(startDate)) return { ...course, future: true, activities: [] };
       const activities = activityLinks(doc);
-      const results = [];
-      for (const activity of activities) results.push(await inspectActivity(activity));
-      return { ...course, activities: results };
+      const results = await mapLimit(activities, 4, inspectActivity);
+      return { ...course, future: false, activities: results };
     } catch (error) {
-      return { ...course, activities: [], error: error.message };
+      return { ...course, future: false, activities: [], error: error.message };
     }
   }
 
   async function runCoursePage() {
     const activities = activityLinks();
-    const results = [];
-    for (let index = 0; index < activities.length; index += 1) {
+    return mapLimit(activities, 4, async (activity, index) => {
       setSummary(`Consultando ${index + 1} de ${activities.length} atividades…`);
-      const result = await inspectActivity(activities[index]);
-      results.push(result);
+      const result = await inspectActivity(activity);
       state.results.set(result.id, result);
-      if (state.settings.moodle.pendingBadges) badge(result.link, result);
-    }
-    return results;
+      if (state.settings.moodle.pendingBadges) activityBadge(result.link, result);
+      return result;
+    });
   }
 
   async function runCategoryPage() {
-    const courses = courseCards();
-    const results = [];
-    for (let index = 0; index < courses.length; index += 1) {
+    const courses = await waitForCourseCards();
+    state.futureCourses = 0;
+    const inspected = await mapLimit(courses, 3, async (course, index) => {
       setSummary(`Consultando ${index + 1} de ${courses.length} cursos…`);
-      const result = await inspectCourse(courses[index]);
-      const pending = result.activities.reduce((sum, activity) => sum + (activity.pending || 0), 0);
-      const partial = result.activities.some(activity => activity.pending === null);
-      results.push(...result.activities);
-      if (state.settings.moodle.pendingBadges) badge(result.link, { pending: pending || (partial ? null : 0) });
-    }
-    results.forEach(result => state.results.set(result.id, result));
-    return results;
+      if (isFuture(course.startDate)) return { ...course, future: true, activities: [] };
+      return inspectCourse(course);
+    });
+
+    const activities = [];
+    inspected.forEach(result => {
+      if (result.future) {
+        state.futureCourses += 1;
+        if (state.settings.moodle.pendingBadges) courseBadge(result, { future: true });
+        return;
+      }
+      const known = result.activities.filter(activity => activity.pending !== null);
+      const pending = known.reduce((sum, activity) => sum + activity.pending, 0);
+      const affected = known.filter(activity => activity.pending > 0).length;
+      const partial = result.error || result.activities.some(activity => activity.pending === null);
+      if (state.settings.moodle.pendingBadges) courseBadge(result, { pending, affected, partial });
+      result.activities.forEach(activity => activities.push(activity));
+    });
+    return activities;
   }
 
   async function run() {
@@ -176,17 +280,24 @@
     state.running = true;
     state.results.clear();
     ensureToolbar();
-    setStatus('Consultando o Moodle. Atividades sem o campo “Precisa de avaliação” serão ignoradas.', 'info');
+    setStatus('Consultando o Moodle. Cursos que ainda não começaram serão ignorados.', 'info');
     const refresh = document.getElementById('sx-pending-refresh');
     if (refresh) refresh.disabled = true;
+
     try {
       const results = pageType() === 'course' ? await runCoursePage() : await runCategoryPage();
+      results.forEach(result => state.results.set(result.id, result));
       const known = results.filter(result => result.pending !== null);
       const pending = known.reduce((sum, result) => sum + result.pending, 0);
       const affected = known.filter(result => result.pending > 0).length;
       const ignored = results.length - known.length;
       setSummary(`${pending} envio(s) em ${affected} atividade(s)`);
-      setStatus(ignored ? `${ignored} atividade(s) não exibem o campo esperado e foram ignoradas sem erro.` : 'Consulta concluída.', ignored ? 'warning' : 'success');
+
+      const notes = [];
+      if (state.futureCourses) notes.push(`${state.futureCourses} curso(s) ainda não iniciado(s) foram ignorados`);
+      if (ignored) notes.push(`${ignored} atividade(s) sem o campo esperado foram ignoradas`);
+      setStatus(notes.length ? `${notes.join('. ')}.` : 'Consulta concluída.', notes.length ? 'warning' : 'success');
+
       const download = document.getElementById('sx-pending-download');
       if (download) download.hidden = !state.settings.moodle.pendingDownloads || !pending;
     } catch (error) {
