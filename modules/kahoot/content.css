@@ -19,3 +19,17 @@
 .sx-kahoot-preview div { padding: 8px 10px; border-top: 1px solid var(--sx-border); color: #505967; font-size: 11px; }
 .sx-kahoot-preview div:first-child { border-top: 0; }
 .sx-kahoot-panel footer { display: flex; justify-content: flex-end; gap: 9px; padding: 14px 20px; border-top: 1px solid var(--sx-border); background: #fbfcfd; }
+.sx-kahoot-progress { position: fixed !important; z-index: 2147483647 !important; top: 72px !important; right: 18px !important; width: 330px !important; padding: 15px !important; border-radius: 14px !important; box-shadow: 0 12px 36px rgba(20, 13, 38, .28) !important; }
+.sx-kahoot-progress__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #46178f; font-size: 13px; }
+.sx-kahoot-progress__head span { font-size: 11px; font-weight: 800; }
+.sx-kahoot-progress__track { height: 8px; margin-top: 11px; overflow: hidden; border-radius: 99px; background: #ece9f1; }
+.sx-kahoot-progress__track span { display: block; width: 0; height: 100%; border-radius: inherit; background: #6c36c9; transition: width .2s ease; }
+.sx-kahoot-progress p { min-height: 34px; margin: 11px 0; color: #55515e; font-size: 11px; line-height: 1.45; }
+.sx-kahoot-progress .sx-button { width: 100%; min-height: 34px; }
+.sx-kahoot-progress[data-tone="success"] { border-color: #75cba5; }
+.sx-kahoot-progress[data-tone="success"] .sx-kahoot-progress__track span { background: #067647; }
+.sx-kahoot-progress[data-tone="success"] p { color: #067647; }
+.sx-kahoot-progress[data-tone="error"] { border-color: #ef9b93; }
+.sx-kahoot-progress[data-tone="error"] .sx-kahoot-progress__track span { background: #b42318; }
+.sx-kahoot-progress[data-tone="error"] p { color: #b42318; }
+.sx-kahoot-progress[data-tone="warning"] p { color: #955b08; }
