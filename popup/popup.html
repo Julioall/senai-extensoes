@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SENAI Extensões</title>
+  <link rel="stylesheet" href="../shared/ui.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="app sx-reset">
+    <section class="shell sx-panel">
+      <header class="header">
+        <button class="back-button" id="back-button" type="button" aria-label="Voltar" hidden>‹</button>
+        <div class="header-copy">
+          <h1 id="view-title">SENAI Extensões</h1>
+          <p id="view-subtitle">Ferramentas para Moodle, Drive e Kahoot</p>
+        </div>
+        <button class="close-button" id="close-button" type="button" aria-label="Fechar">×</button>
+      </header>
+
+      <div class="content" id="view-home" data-view="home">
+        <section class="section">
+          <h2 class="sx-section-title">Recursos ativos</h2>
+          <button class="nav-row" type="button" data-open-view="moodle">
+            <span class="row-icon row-icon--blue" aria-hidden="true">M</span>
+            <span class="row-copy"><strong>Moodle</strong><small>Correções, relatórios e pendências</small></span>
+            <span class="row-switch" data-module-switch="moodle" role="switch" aria-label="Ativar Moodle" tabindex="0"></span>
+          </button>
+          <button class="nav-row" type="button" data-open-view="drivePdf">
+            <span class="row-icon row-icon--green" aria-hidden="true">PDF</span>
+            <span class="row-copy"><strong>Baixar PDF</strong><small>Preparar documentos do Google Drive</small></span>
+            <span class="row-switch" data-module-switch="drivePdf" role="switch" aria-label="Ativar Baixar PDF" tabindex="0"></span>
+          </button>
+          <button class="nav-row" type="button" data-open-view="kahoot">
+            <span class="row-icon row-icon--purple" aria-hidden="true">K</span>
+            <span class="row-copy"><strong>KahootOmático</strong><small>Importar questões por CSV</small></span>
+            <span class="row-switch" data-module-switch="kahoot" role="switch" aria-label="Ativar KahootOmático" tabindex="0"></span>
+          </button>
+        </section>
+
+        <section class="section">
+          <h2 class="sx-section-title">Acesso</h2>
+          <div class="info-row">
+            <span class="row-icon row-icon--blue" aria-hidden="true">◎</span>
+            <span class="row-copy"><strong id="site-label">Este site</strong><small id="site-description">Verificando a página atual…</small></span>
+          </div>
+        </section>
+      </div>
+
+      <div class="content" id="view-moodle" data-view="moodle" hidden>
+        <section class="section">
+          <h2 class="sx-section-title">Recursos ativos</h2>
+          <label class="setting-row"><span class="row-icon row-icon--blue">↥</span><span class="row-copy"><strong>Importação de notas</strong><small>Importar nota, feedback e situação por CSV</small></span><input type="checkbox" data-setting="moodle.importer"><span class="toggle"></span></label>
+          <label class="setting-row"><span class="row-icon row-icon--blue">▥</span><span class="row-copy"><strong>Relatório de notas</strong><small>Agrupar unidades por turma em planilha</small></span><input type="checkbox" data-setting="moodle.gradeReports"><span class="toggle"></span></label>
+          <label class="setting-row"><span class="row-icon row-icon--orange">◷</span><span class="row-copy"><strong>Pendências de correção</strong><small>Consultar atividades nas páginas do Moodle</small></span><input type="checkbox" data-setting="moodle.coursePendingChecks"><span class="toggle"></span></label>
+          <label class="setting-row"><span class="row-icon row-icon--green">⇩</span><span class="row-copy"><strong>Baixar pendentes</strong><small>Baixar envios que aguardam avaliação</small></span><input type="checkbox" data-setting="moodle.pendingDownloads"><span class="toggle"></span></label>
+        </section>
+        <section class="section">
+          <h2 class="sx-section-title">Comportamento</h2>
+          <label class="setting-row"><span class="row-icon row-icon--purple">✎</span><span class="row-copy"><strong>Substituir notas preenchidas</strong></span><input type="checkbox" data-setting="moodle.overwriteGrades"><span class="toggle"></span></label>
+          <label class="setting-row"><span class="row-icon row-icon--purple">◯</span><span class="row-copy"><strong>Substituir feedback preenchido</strong></span><input type="checkbox" data-setting="moodle.overwriteFeedback"><span class="toggle"></span></label>
+          <label class="setting-row"><span class="row-icon row-icon--green">Aa</span><span class="row-copy"><strong>Aceitar diferenças nos nomes</strong></span><input type="checkbox" data-setting="moodle.flexibleNames"><span class="toggle"></span></label>
+        </section>
+      </div>
+
+      <div class="content" id="view-drivePdf" data-view="drivePdf" hidden>
+        <section class="section">
+          <h2 class="sx-section-title">Baixar PDF</h2>
+          <div class="description-card"><strong>Como usar</strong><p>Abra um documento no Google Drive. O botão <b>Baixar PDF</b> aparecerá no canto da página.</p></div>
+          <label class="setting-row"><span class="row-icon row-icon--green">▧</span><span class="row-copy"><strong>Incluir plano de fundo</strong><small>Preservar fundos e imagens na impressão</small></span><input type="checkbox" data-setting="drivePdf.includeBackground"><span class="toggle"></span></label>
+          <label class="setting-row"><span class="row-icon row-icon--blue">↔</span><span class="row-copy"><strong>Margens compactas</strong><small>Aproveitar melhor o espaço da página</small></span><input type="checkbox" data-setting="drivePdf.compactMargins"><span class="toggle"></span></label>
+        </section>
+      </div>
+
+      <div class="content" id="view-kahoot" data-view="kahoot" hidden>
+        <section class="section">
+          <h2 class="sx-section-title">KahootOmático</h2>
+          <div class="description-card"><strong>Como usar</strong><p>Abra o editor do Kahoot e use o botão flutuante para selecionar um CSV de perguntas.</p></div>
+          <label class="setting-row"><span class="row-icon row-icon--purple">↻</span><span class="row-copy"><strong>Substituir pergunta atual</strong><small>Usar a pergunta aberta como primeiro item</small></span><input type="checkbox" data-setting="kahoot.replaceCurrent"><span class="toggle"></span></label>
+          <label class="setting-row"><span class="row-icon row-icon--green">✓</span><span class="row-copy"><strong>Validar antes de executar</strong><small>Bloquear arquivos com dados incompletos</small></span><input type="checkbox" data-setting="kahoot.validateBeforeRun"><span class="toggle"></span></label>
+          <label class="field-row"><span><strong>Intervalo entre perguntas</strong><small>Tempo para o editor atualizar</small></span><select class="select" data-setting="kahoot.delayMs"><option value="600">Rápido</option><option value="900">Normal</option><option value="1400">Seguro</option></select></label>
+        </section>
+      </div>
+
+      <p class="status" id="status" role="status" aria-live="polite">Configurações salvas automaticamente.</p>
+
+      <footer class="footer">
+        <button id="manage-extension" type="button"><span class="row-icon">⚙</span><span>Gerenciar extensão</span><span class="chevron">›</span></button>
+      </footer>
+    </section>
+  </main>
+  <script src="../shared/runtime.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

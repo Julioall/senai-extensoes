@@ -1,0 +1,99 @@
+{
+  "manifest_version": 3,
+  "name": "SENAI Extensões",
+  "version": "1.0.0",
+  "description": "Suíte modular de ferramentas para Moodle, Google Drive e Kahoot.",
+  "permissions": [
+    "activeTab",
+    "downloads",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://ead.fieg.com.br/*",
+    "https://ead.senai.br/*",
+    "https://drive.google.com/*",
+    "https://create.kahoot.it/*"
+  ],
+  "action": {
+    "default_title": "SENAI Extensões",
+    "default_popup": "popup/popup.html"
+  },
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://ead.fieg.com.br/mod/assign/view.php*",
+        "https://ead.senai.br/mod/assign/view.php*"
+      ],
+      "js": [
+        "shared/runtime.js",
+        "modules/moodle/importer/content.js"
+      ],
+      "css": [
+        "shared/ui.css",
+        "modules/moodle/importer/content.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://ead.fieg.com.br/course/view.php*",
+        "https://ead.fieg.com.br/course/index.php*",
+        "https://ead.senai.br/course/view.php*",
+        "https://ead.senai.br/course/index.php*"
+      ],
+      "js": [
+        "shared/runtime.js",
+        "modules/moodle/pending/content.js"
+      ],
+      "css": [
+        "shared/ui.css",
+        "modules/moodle/pending/content.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://ead.fieg.com.br/my/courses.php*",
+        "https://ead.senai.br/my/*"
+      ],
+      "js": [
+        "shared/runtime.js",
+        "modules/moodle/reports/content.js"
+      ],
+      "css": [
+        "shared/ui.css",
+        "modules/moodle/reports/content.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://drive.google.com/*"],
+      "js": [
+        "shared/runtime.js",
+        "modules/drive-pdf/content.js"
+      ],
+      "css": [
+        "shared/ui.css",
+        "modules/drive-pdf/content.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://create.kahoot.it/*"],
+      "js": [
+        "shared/runtime.js",
+        "modules/kahoot/content.js"
+      ],
+      "css": [
+        "shared/ui.css",
+        "modules/kahoot/content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
