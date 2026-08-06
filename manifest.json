@@ -94,7 +94,8 @@
       ],
       "js": [
         "shared/runtime.js",
-        "modules/kahoot/content.js"
+        "modules/kahoot/content.js",
+        "modules/kahoot/native-button.js"
       ],
       "css": [
         "shared/ui.css",
