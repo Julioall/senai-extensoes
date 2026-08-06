@@ -63,11 +63,15 @@
 
   function copyComputedStyle(source, target) {
     const computed = getComputedStyle(source);
+    const parentComputed = source.parentElement ? getComputedStyle(source.parentElement) : null;
+    const parentGap = parentComputed?.rowGap || parentComputed?.gap || '0px';
+    const hasParentGap = Number.parseFloat(parentGap) > 0;
+
     COPIED_PROPERTIES.forEach(property => {
       target.style.setProperty(property, computed.getPropertyValue(property), 'important');
     });
     target.style.setProperty('width', '100%', 'important');
-    target.style.setProperty('margin-top', computed.marginBottom || '8px', 'important');
+    target.style.setProperty('margin-top', hasParentGap ? '0' : '8px', 'important');
     target.style.setProperty('margin-right', '0', 'important');
     target.style.setProperty('margin-bottom', '0', 'important');
     target.style.setProperty('margin-left', '0', 'important');
