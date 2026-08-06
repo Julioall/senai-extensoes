@@ -1,5 +1,18 @@
 # Histórico de versões
 
+## 1.1.0 - 2026-08-06
+
+- Adota um design system único em azul para popup, Moodle e Kahoot.
+- Simplifica o popup para exibir somente recursos ativos e ferramentas Moodle.
+- Remove as seções Comportamento, Acesso e Gerenciar extensão do popup.
+- Redesenha o importador Moodle no fluxo **Adicionar → Validar → Executar**, com rolagem interna, resumo de validação e cancelamento.
+- Integra o botão azul **Importar!** à barra lateral do editor do Kahoot.
+- Adiciona modal de seleção e validação CSV ao Kahoot.
+- Executa a automação do Kahoot com a página liberada para interação e um painel discreto de progresso, tempo e opção Ocultar.
+- Substitui o modal do Google Drive por um botão verde **Baixar** com contador interno de páginas.
+- Faz o preenchimento verde do botão do Drive acompanhar a proporção de páginas identificadas.
+- Remove os patches temporários de interface dos módulos Drive e Kahoot.
+
 ## 1.0.2 - 2026-08-05
 
 - Simplifica o nome do módulo para **Kahoot**.
