@@ -26,7 +26,7 @@
 
 - Simplifica o nome do módulo para **Kahoot**.
 - Altera a ação do Google Drive para um botão verde **Baixar**, com símbolo de download.
-- Remove a configuração de margens compactas da interface e passa a usá-la automaticamente.
+- Remove a configuração de margens compactas da interface e passa a usá-las automaticamente.
 - Reestrutura o importador Moodle com os seletores validados no projeto `importa_notas`.
 - Reposiciona o botão **Importar** na navegação de notas, com alternativa flutuante quando necessário.
 - Reestrutura a consulta de pendências por curso e categoria, ignorando cursos futuros.
