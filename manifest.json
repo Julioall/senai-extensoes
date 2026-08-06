@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SENAI Extensões",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Suíte modular de ferramentas para Moodle, Google Drive e Kahoot.",
   "permissions": [
     "activeTab",
@@ -31,11 +31,12 @@
       ],
       "js": [
         "shared/runtime.js",
-        "modules/moodle/importer/content.js"
+        "modules/moodle/importer/content-v2.js"
       ],
       "css": [
         "shared/ui.css",
-        "modules/moodle/importer/content.css"
+        "modules/moodle/importer/content.css",
+        "modules/moodle/importer/content-v2.css"
       ],
       "run_at": "document_idle"
     },
@@ -48,7 +49,7 @@
       ],
       "js": [
         "shared/runtime.js",
-        "modules/moodle/pending/content.js"
+        "modules/moodle/pending/content-v2.js"
       ],
       "css": [
         "shared/ui.css",
@@ -63,7 +64,7 @@
       ],
       "js": [
         "shared/runtime.js",
-        "modules/moodle/reports/content.js"
+        "modules/moodle/reports/content-v2.js"
       ],
       "css": [
         "shared/ui.css",
@@ -77,11 +78,13 @@
       ],
       "js": [
         "shared/runtime.js",
-        "modules/drive-pdf/content.js"
+        "modules/drive-pdf/content.js",
+        "modules/drive-pdf/ui-patch.js"
       ],
       "css": [
         "shared/ui.css",
-        "modules/drive-pdf/content.css"
+        "modules/drive-pdf/content.css",
+        "modules/drive-pdf/ui-patch.css"
       ],
       "run_at": "document_idle"
     },
@@ -91,7 +94,8 @@
       ],
       "js": [
         "shared/runtime.js",
-        "modules/kahoot/content.js"
+        "modules/kahoot/content.js",
+        "modules/kahoot/ui-patch.js"
       ],
       "css": [
         "shared/ui.css",
