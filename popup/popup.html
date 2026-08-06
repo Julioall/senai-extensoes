@@ -8,85 +8,88 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <main class="app sx-reset">
-    <section class="shell sx-panel">
-      <header class="header">
-        <button class="back-button" id="back-button" type="button" aria-label="Voltar" hidden>‹</button>
-        <div class="header-copy">
-          <h1 id="view-title">SENAI Extensões</h1>
-          <p id="view-subtitle">Ferramentas para Moodle, Drive e Kahoot</p>
+  <main class="sx-popup sx-reset">
+    <section class="sx-popup__shell sx-panel">
+      <header class="sx-popup__header">
+        <span class="sx-brand-mark" aria-hidden="true">S</span>
+        <div class="sx-popup__heading">
+          <h1>SENAI Extensões</h1>
+          <p>Ferramentas para Moodle, Drive e Kahoot</p>
         </div>
-        <button class="close-button" id="close-button" type="button" aria-label="Fechar">×</button>
+        <button class="sx-icon-button" id="close-button" type="button" aria-label="Fechar">
+          <svg class="sx-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
       </header>
 
-      <div class="content" id="view-home" data-view="home">
-        <section class="section">
-          <h2 class="sx-section-title">Recursos ativos</h2>
-          <button class="nav-row" type="button" data-open-view="moodle">
-            <span class="row-icon row-icon--blue" aria-hidden="true">M</span>
-            <span class="row-copy"><strong>Moodle</strong><small>Correções, relatórios e pendências</small></span>
-            <span class="row-switch" data-module-switch="moodle" role="switch" aria-label="Ativar Moodle" tabindex="0"></span>
-          </button>
-          <button class="nav-row" type="button" data-open-view="drivePdf">
-            <span class="row-icon row-icon--green" aria-hidden="true">↓</span>
-            <span class="row-copy"><strong>Baixar</strong><small>Salvar documentos do Google Drive em PDF</small></span>
-            <span class="row-switch" data-module-switch="drivePdf" role="switch" aria-label="Ativar Baixar" tabindex="0"></span>
-          </button>
-          <button class="nav-row" type="button" data-open-view="kahoot">
-            <span class="row-icon row-icon--purple" aria-hidden="true">K</span>
-            <span class="row-copy"><strong>Kahoot</strong><small>Importar questões por CSV</small></span>
-            <span class="row-switch" data-module-switch="kahoot" role="switch" aria-label="Ativar Kahoot" tabindex="0"></span>
-          </button>
+      <div class="sx-popup__content">
+        <section class="sx-settings-card" aria-labelledby="modules-title">
+          <h2 class="sx-section-title" id="modules-title">Recursos ativos</h2>
+          <div class="sx-settings-list">
+            <label class="sx-setting-row">
+              <span class="sx-setting-icon sx-setting-icon--moodle" aria-hidden="true">
+                <svg class="sx-icon" viewBox="0 0 24 24"><path d="m3 8 9-4 9 4-9 4-9-4Z"/><path d="M7 10.2V15c2.6 2 7.4 2 10 0v-4.8M21 8v6"/></svg>
+              </span>
+              <span class="sx-setting-copy"><strong>Moodle</strong></span>
+              <input type="checkbox" data-setting="modules.moodle" aria-label="Ativar Moodle">
+              <span class="sx-switch" aria-hidden="true"></span>
+            </label>
+            <label class="sx-setting-row">
+              <span class="sx-setting-icon sx-setting-icon--green" aria-hidden="true">
+                <svg class="sx-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16h14V6Z"/><path d="M14 2v4h4M9 13h6M12 10v6m-3-3 3 3 3-3"/></svg>
+              </span>
+              <span class="sx-setting-copy"><strong>Baixar PDF</strong></span>
+              <input type="checkbox" data-setting="modules.drivePdf" aria-label="Ativar Baixar PDF">
+              <span class="sx-switch" aria-hidden="true"></span>
+            </label>
+            <label class="sx-setting-row">
+              <span class="sx-setting-icon sx-setting-icon--kahoot" aria-hidden="true">K!</span>
+              <span class="sx-setting-copy"><strong>Kahoot</strong></span>
+              <input type="checkbox" data-setting="modules.kahoot" aria-label="Ativar Kahoot">
+              <span class="sx-switch" aria-hidden="true"></span>
+            </label>
+          </div>
         </section>
 
-        <section class="section">
-          <h2 class="sx-section-title">Acesso</h2>
-          <div class="info-row">
-            <span class="row-icon row-icon--blue" aria-hidden="true">◎</span>
-            <span class="row-copy"><strong id="site-label">Este site</strong><small id="site-description">Verificando a página atual…</small></span>
+        <section class="sx-settings-card" aria-labelledby="moodle-title">
+          <h2 class="sx-section-title" id="moodle-title">Moodle</h2>
+          <div class="sx-settings-list">
+            <label class="sx-setting-row">
+              <span class="sx-setting-icon sx-setting-icon--blue" aria-hidden="true">
+                <svg class="sx-icon" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 14v5h14v-5"/></svg>
+              </span>
+              <span class="sx-setting-copy"><strong>Importação de notas</strong></span>
+              <input type="checkbox" data-setting="moodle.importer">
+              <span class="sx-switch" aria-hidden="true"></span>
+            </label>
+            <label class="sx-setting-row">
+              <span class="sx-setting-icon sx-setting-icon--blue" aria-hidden="true">
+                <svg class="sx-icon" viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+              </span>
+              <span class="sx-setting-copy"><strong>Relatório de notas</strong></span>
+              <input type="checkbox" data-setting="moodle.gradeReports">
+              <span class="sx-switch" aria-hidden="true"></span>
+            </label>
+            <label class="sx-setting-row">
+              <span class="sx-setting-icon sx-setting-icon--orange" aria-hidden="true">
+                <svg class="sx-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>
+              </span>
+              <span class="sx-setting-copy"><strong>Pendências de correção</strong></span>
+              <input type="checkbox" data-setting="moodle.coursePendingChecks">
+              <span class="sx-switch" aria-hidden="true"></span>
+            </label>
+            <label class="sx-setting-row">
+              <span class="sx-setting-icon sx-setting-icon--green" aria-hidden="true">
+                <svg class="sx-icon" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5"/><path d="M5 19h14"/></svg>
+              </span>
+              <span class="sx-setting-copy"><strong>Baixar pendentes</strong></span>
+              <input type="checkbox" data-setting="moodle.pendingDownloads">
+              <span class="sx-switch" aria-hidden="true"></span>
+            </label>
           </div>
         </section>
       </div>
 
-      <div class="content" id="view-moodle" data-view="moodle" hidden>
-        <section class="section">
-          <h2 class="sx-section-title">Recursos ativos</h2>
-          <label class="setting-row"><span class="row-icon row-icon--blue">↥</span><span class="row-copy"><strong>Importação de notas</strong><small>Importar nota, feedback e situação por CSV</small></span><input type="checkbox" data-setting="moodle.importer"><span class="toggle"></span></label>
-          <label class="setting-row"><span class="row-icon row-icon--blue">▥</span><span class="row-copy"><strong>Relatório de notas</strong><small>Agrupar unidades por turma em planilha XLSX</small></span><input type="checkbox" data-setting="moodle.gradeReports"><span class="toggle"></span></label>
-          <label class="setting-row"><span class="row-icon row-icon--orange">◷</span><span class="row-copy"><strong>Pendências de correção</strong><small>Consultar atividades nas páginas do Moodle</small></span><input type="checkbox" data-setting="moodle.coursePendingChecks"><span class="toggle"></span></label>
-          <label class="setting-row"><span class="row-icon row-icon--green">⇩</span><span class="row-copy"><strong>Baixar pendentes</strong><small>Baixar envios que aguardam avaliação</small></span><input type="checkbox" data-setting="moodle.pendingDownloads"><span class="toggle"></span></label>
-        </section>
-        <section class="section">
-          <h2 class="sx-section-title">Comportamento</h2>
-          <label class="setting-row"><span class="row-icon row-icon--purple">✎</span><span class="row-copy"><strong>Substituir notas preenchidas</strong></span><input type="checkbox" data-setting="moodle.overwriteGrades"><span class="toggle"></span></label>
-          <label class="setting-row"><span class="row-icon row-icon--purple">◯</span><span class="row-copy"><strong>Substituir feedback preenchido</strong></span><input type="checkbox" data-setting="moodle.overwriteFeedback"><span class="toggle"></span></label>
-          <label class="setting-row"><span class="row-icon row-icon--green">Aa</span><span class="row-copy"><strong>Aceitar diferenças nos nomes</strong></span><input type="checkbox" data-setting="moodle.flexibleNames"><span class="toggle"></span></label>
-        </section>
-      </div>
-
-      <div class="content" id="view-drivePdf" data-view="drivePdf" hidden>
-        <section class="section">
-          <h2 class="sx-section-title">Baixar</h2>
-          <div class="description-card"><strong>Como usar</strong><p>Abra um documento no Google Drive. O botão verde <b>Baixar</b> aparecerá no canto da página e gerará o PDF com margens mínimas.</p></div>
-          <label class="setting-row"><span class="row-icon row-icon--green">▧</span><span class="row-copy"><strong>Incluir plano de fundo</strong><small>Preservar fundos e imagens do documento</small></span><input type="checkbox" data-setting="drivePdf.includeBackground"><span class="toggle"></span></label>
-        </section>
-      </div>
-
-      <div class="content" id="view-kahoot" data-view="kahoot" hidden>
-        <section class="section">
-          <h2 class="sx-section-title">Kahoot</h2>
-          <div class="description-card"><strong>Como usar</strong><p>Abra o editor do Kahoot e use o botão flutuante para selecionar um CSV de perguntas.</p></div>
-          <label class="setting-row"><span class="row-icon row-icon--purple">↻</span><span class="row-copy"><strong>Substituir pergunta atual</strong><small>Usar a pergunta aberta como primeiro item</small></span><input type="checkbox" data-setting="kahoot.replaceCurrent"><span class="toggle"></span></label>
-          <label class="setting-row"><span class="row-icon row-icon--green">✓</span><span class="row-copy"><strong>Validar antes de executar</strong><small>Bloquear arquivos com dados incompletos</small></span><input type="checkbox" data-setting="kahoot.validateBeforeRun"><span class="toggle"></span></label>
-          <label class="field-row"><span><strong>Intervalo entre perguntas</strong><small>Tempo para o editor atualizar</small></span><select class="select" data-setting="kahoot.delayMs"><option value="600">Rápido</option><option value="900">Normal</option><option value="1400">Seguro</option></select></label>
-        </section>
-      </div>
-
-      <p class="status" id="status" role="status" aria-live="polite">Configurações salvas automaticamente.</p>
-
-      <footer class="footer">
-        <button id="manage-extension" type="button"><span class="row-icon">⚙</span><span>Gerenciar extensão</span><span class="chevron">›</span></button>
-      </footer>
+      <p class="sx-popup__status" id="status" role="status" aria-live="polite"></p>
     </section>
   </main>
   <script src="../shared/runtime.js"></script>
