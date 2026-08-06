@@ -12,9 +12,10 @@
       const activeIndexes = steps.map((step, index) => step.classList.contains('is-active') ? index : -1).filter(index => index >= 0);
       const current = activeIndexes.length ? Math.max(...activeIndexes) : 0;
       steps.forEach((step, index) => {
-        step.classList.toggle('is-complete', index < current);
+        const complete = index < current;
+        step.classList.toggle('is-complete', complete);
         const circle = step.querySelector('span');
-        if (circle && index < current) circle.textContent = '✓';
+        if (circle) circle.textContent = complete ? '✓' : String(index + 1);
       });
     }
 
