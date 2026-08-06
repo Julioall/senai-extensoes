@@ -8,13 +8,12 @@
   const backButton = document.getElementById('back-button');
   const status = document.getElementById('status');
   let settings;
-  let currentView = 'home';
 
   const viewMeta = {
     home: ['SENAI Extensões', 'Ferramentas para Moodle, Drive e Kahoot'],
     moodle: ['Moodle', 'Correções, relatórios e pendências'],
-    drivePdf: ['Baixar PDF', 'Preparação de documentos do Google Drive'],
-    kahoot: ['KahootOmático', 'Importação automatizada de questões']
+    drivePdf: ['Baixar', 'Salvar documentos do Google Drive em PDF'],
+    kahoot: ['Kahoot', 'Importação automatizada de questões']
   };
 
   function setStatus(message, isError = false) {
@@ -23,7 +22,6 @@
   }
 
   function showView(name) {
-    currentView = name;
     views.forEach(view => { view.hidden = view.dataset.view !== name; });
     title.textContent = viewMeta[name][0];
     subtitle.textContent = viewMeta[name][1];
@@ -40,8 +38,9 @@
 
   function renderSettings() {
     document.querySelectorAll('[data-module-switch]').forEach(toggle => {
-      toggle.classList.toggle('is-on', Boolean(settings.modules[toggle.dataset.moduleSwitch]));
-      toggle.setAttribute('aria-checked', String(Boolean(settings.modules[toggle.dataset.moduleSwitch])));
+      const enabled = Boolean(settings.modules[toggle.dataset.moduleSwitch]);
+      toggle.classList.toggle('is-on', enabled);
+      toggle.setAttribute('aria-checked', String(enabled));
     });
     document.querySelectorAll('[data-setting]').forEach(input => {
       const value = getPath(settings, input.dataset.setting);
@@ -99,9 +98,7 @@
 
     backButton.addEventListener('click', () => showView('home'));
     document.getElementById('close-button').addEventListener('click', () => window.close());
-    document.getElementById('manage-extension').addEventListener('click', () => {
-      chrome.runtime.sendMessage({ type: 'SENAI_EXT_OPEN_MANAGE' });
-    });
+    document.getElementById('manage-extension').addEventListener('click', () => chrome.runtime.sendMessage({ type: 'SENAI_EXT_OPEN_MANAGE' }));
   }
 
   function updateSiteInfo() {
