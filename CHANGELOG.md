@@ -1,5 +1,14 @@
 # Histórico de versões
 
+## 1.1.1 - 2026-08-06
+
+- Reduz as dimensões fixas dos modais Moodle e Kahoot e limita o tamanho ao espaço útil da janela.
+- Adiciona uma variação ainda mais compacta para telas com pouca altura.
+- Faz o botão **Importar!** copiar tamanho, tipografia, raio, borda e cores do botão **Add** do próprio Kahoot.
+- Reduz o popup da extensão de 420 px para 372 px.
+- Remove a margem e o fundo externo do popup para evitar a aparência de uma janela branca quadrada ao redor do painel.
+- Mantém o conteúdo do popup em uma única superfície arredondada, com rolagem somente na lista de recursos.
+
 ## 1.1.0 - 2026-08-06
 
 - Adota um design system único em azul para popup, Moodle e Kahoot.
