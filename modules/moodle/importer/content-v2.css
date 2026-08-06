@@ -1,0 +1,4 @@
+.sx-importer-open { margin-left: 8px !important; white-space: nowrap !important; }
+.sx-importer-open.sx-importer-floating { position: fixed !important; z-index: 99998 !important; right: 22px !important; bottom: 22px !important; margin: 0 !important; box-shadow: 0 8px 24px rgba(20,34,55,.24) !important; }
+.sx-importer-toast { position: fixed !important; z-index: 100002 !important; right: 22px !important; bottom: 78px !important; max-width: 390px !important; padding: 12px 14px !important; border: 1px solid #f0d498 !important; border-radius: 10px !important; background: #fff8e8 !important; color: #865400 !important; box-shadow: 0 10px 28px rgba(20,34,55,.2) !important; font-size: 12px !important; line-height: 1.45 !important; }
+.sx-importer-toast.is-success { border-color: #b9e4ca !important; background: #eefaf3 !important; color: #187346 !important; }
