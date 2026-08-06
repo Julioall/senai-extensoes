@@ -42,6 +42,17 @@
         actions.prepend(cancel);
       }
     }
+
+    const executionResult = modal.querySelector('[data-execution-result]');
+    if (executionResult?.textContent.trim()) {
+      stage?.querySelector('.sx-importer-loader')?.remove();
+      const executionHeading = stage?.querySelector(':scope > h3');
+      const executionText = stage?.querySelector(':scope > p');
+      if (executionHeading) executionHeading.textContent = 'Execução concluída';
+      if (executionText) executionText.textContent = 'Revise os dados preenchidos antes de salvar no Moodle.';
+      const finish = modal.querySelector('[data-action="finish"]');
+      if (finish) finish.classList.add('sx-button--success');
+    }
   }
 
   document.addEventListener('change', event => {
