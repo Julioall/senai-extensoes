@@ -7,7 +7,8 @@ Suíte modular para Chrome e Microsoft Edge com ferramentas de apoio ao trabalho
 ### Moodle
 
 - importação de notas, feedbacks e situações por CSV, TSV ou TXT;
-- fluxo em três etapas: **Adicionar → Validar → Executar**;
+- fluxo visual em três etapas: **Adicionar → Validar → Executar**;
+- resumo de registros encontrados e não encontrados antes da execução;
 - preenchimento em massa de nota e feedback;
 - correspondência flexível de nomes;
 - relatório `.xlsx` agrupado por turma, com uma coluna para cada unidade curricular;
@@ -18,19 +19,24 @@ Suíte modular para Chrome e Microsoft Edge com ferramentas de apoio ao trabalho
 
 ### Google Drive
 
-- detecção das páginas carregadas no visualizador;
+- detecção contínua das páginas carregadas no visualizador;
+- botão verde **Baixar** integrado à página, sem abrir modal;
+- contador interno no formato `identificadas/total`;
+- preenchimento visual do botão conforme as páginas são descobertas;
 - geração local de um arquivo PDF real;
-- botão verde **Baixar** com símbolo de download;
 - margens mínimas aplicadas automaticamente;
 - preservação do conteúdo e do plano de fundo das páginas.
 
 ### Kahoot
 
-- importação de perguntas por CSV;
+- botão azul **Importar!** integrado à barra lateral do editor;
+- seleção e validação do CSV em um fluxo guiado;
 - validação das colunas e das respostas corretas;
+- pré-visualização das perguntas antes da execução;
 - preenchimento sequencial no editor do Kahoot;
-- cancelamento durante a execução;
-- intervalo configurável entre perguntas.
+- painel discreto com andamento, tempo e opção **Ocultar**;
+- página do Kahoot permanece disponível para interação durante a automação;
+- cancelamento durante a execução.
 
 ## Instalação para desenvolvimento
 
