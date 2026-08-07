@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SENAI Extensões",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Suíte modular de ferramentas para Moodle, Google Drive e Kahoot.",
   "permissions": [
     "activeTab",
@@ -94,7 +94,7 @@
       ],
       "js": [
         "shared/runtime.js",
-        "modules/kahoot/content.js",
+        "modules/kahoot/content-v2.js",
         "modules/kahoot/native-button.js"
       ],
       "css": [
