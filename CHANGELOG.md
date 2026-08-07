@@ -1,5 +1,14 @@
 # Histórico de versões
 
+## 1.1.2 - 2026-08-07
+
+- Corrige o erro **“O editor não está pronto: seleção da alternativa correta”** no Kahoot.
+- Remove a exigência do seletor de resposta correta durante o diagnóstico inicial do editor.
+- Passa a localizar o controle correto somente depois que a pergunta e as quatro alternativas forem preenchidas.
+- Amplia a detecção para controles por `data-functional-selector`, `data-testid`, `aria-checked`, `aria-pressed`, radio, checkbox e botões dentro de cada alternativa.
+- Evita confundir o botão de imagem/mídia da alternativa com o seletor de resposta correta.
+- Mantém o painel de progresso e o editor liberado durante a automação.
+
 ## 1.1.1 - 2026-08-06
 
 - Reduz as dimensões fixas dos modais Moodle e Kahoot e limita o tamanho ao espaço útil da janela.
