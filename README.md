@@ -8,27 +8,39 @@ Suíte modular para Chrome e Microsoft Edge com ferramentas de apoio ao trabalho
 
 - importação de notas, feedbacks e situações por CSV, TSV ou TXT;
 - fluxo em três etapas: **Adicionar → Validar → Executar**;
+- modal responsivo, limitado à área útil da janela;
 - preenchimento em massa de nota e feedback;
 - correspondência flexível de nomes;
-- relatório de notas agrupado por turma, com uma coluna para cada unidade curricular;
+- relatório `.xlsx` agrupado por turma, com uma coluna para cada unidade curricular;
 - cancelamento da geração do relatório;
 - identificação de atividades com envios aguardando avaliação;
+- exclusão de cursos ainda não iniciados da consulta por categoria;
 - download dos envios pendentes quando a estrutura da atividade permitir.
 
 ### Google Drive
 
 - detecção das páginas carregadas no visualizador;
-- organização das páginas em formato A4;
-- abertura do diálogo de impressão para salvar em PDF;
-- opções de plano de fundo e margens compactas.
+- geração local de um arquivo PDF real;
+- botão verde **Baixar** com símbolo de download;
+- margens mínimas aplicadas automaticamente;
+- preservação do conteúdo e do plano de fundo das páginas.
 
-### KahootOmático
+### Kahoot
 
 - importação de perguntas por CSV;
+- botão **Importar!** alinhado ao estilo do botão nativo **Add**;
+- modal responsivo para seleção e validação do arquivo;
 - validação das colunas e das respostas corretas;
 - preenchimento sequencial no editor do Kahoot;
 - cancelamento durante a execução;
 - intervalo configurável entre perguntas.
+
+### Popup da extensão
+
+- painel compacto com largura de 372 px;
+- superfície única com cantos arredondados;
+- sem margem ou fundo externo adicional;
+- rolagem restrita à lista de ferramentas.
 
 ## Instalação para desenvolvimento
 
@@ -55,7 +67,7 @@ pergunta;opcao1;opcao2;opcao3;opcao4;correta
 Qual é a capital de Goiás?;Goiânia;Anápolis;Brasília;Rio Verde;1
 ```
 
-A coluna `correta` deve indicar uma alternativa de `1` a `4`.
+A coluna `correta` deve indicar uma alternativa de `1` a `4`, uma letra de `A` a `D` ou o texto exato da alternativa.
 
 ## Estrutura do projeto
 

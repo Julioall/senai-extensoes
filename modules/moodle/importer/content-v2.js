@@ -1,22 +1,15 @@
 (() => {
   'use strict';
 
-  if (document.documentElement.dataset.sxMoodleImporter === '1') return;
-  document.documentElement.dataset.sxMoodleImporter = '1';
+  if (document.documentElement.dataset.sxMoodleImporterV2 === '1') return;
+  document.documentElement.dataset.sxMoodleImporterV2 = '1';
 
-  const {
-    getSettings,
-    normalizeText,
-    parseDelimited,
-    similarity,
-    setNativeValue,
-    escapeHtml
-  } = SenaiExt;
+  const { getSettings, normalizeText, parseDelimited, similarity, setNativeValue, escapeHtml } = SenaiExt;
 
   const HEADER_ALIASES = {
-    nome: ['nome', 'aluno', 'estudante', 'discente', 'nome do aluno', 'nome completo'],
-    nota: ['nota', 'grade', 'pontuacao', 'pontuação', 'score', 'nota final'],
-    feedback: ['feedback', 'comentario', 'comentário', 'comentarios', 'comentários', 'devolutiva', 'retorno'],
+    nome: ['nome', 'aluno', 'estudante', 'discente', 'nome do aluno', 'nome completo', 'nome do estudante'],
+    nota: ['nota', 'grade', 'pontuacao', 'pontuação', 'score', 'nota final', 'nota sugerida'],
+    feedback: ['feedback', 'comentario', 'comentário', 'comentarios', 'comentários', 'devolutiva', 'retorno', 'observacao', 'observação'],
     situacao: ['situacao', 'situação', 'status', 'tag', 'classificacao', 'classificação']
   };
 
@@ -30,24 +23,26 @@
     mode: 'file'
   };
 
-  function normalizeHeader(value) {
-    return normalizeText(value);
-  }
-
-  function resolveColumn(headers, aliases) {
-    return headers.findIndex(header => aliases.some(alias => normalizeHeader(alias) === normalizeHeader(header)));
-  }
-
-  function pageSupported() {
+  function gradingPage() {
     const url = new URL(location.href);
-    const gradingAction = url.searchParams.get('action') === 'grading';
-    const gradingTable = Boolean(document.querySelector('#submissions'));
-    return /\/mod\/assign\/view\.php$/.test(url.pathname) && (gradingAction || gradingTable);
+    return /\/mod\/assign\/view\.php$/.test(url.pathname) && url.searchParams.get('action') === 'grading';
+  }
+
+  function gradeInputs(root = document) {
+    return [...root.querySelectorAll(
+      'input.quickgrade[id^="quickgrade_"],input.quickgrade[name^="quickgrade_"],input[id^="quickgrade_"],input[name^="quickgrade_"]'
+    )].filter(input => !/comments/i.test(`${input.id} ${input.name}`));
+  }
+
+  function feedbackInputs(root = document) {
+    return [...root.querySelectorAll(
+      'textarea.quickgrade[id^="quickgrade_comments_"],textarea.quickgrade[name^="quickgrade_comments_"],textarea[id^="quickgrade_comments_"],textarea[name^="quickgrade_comments_"]'
+    )];
   }
 
   function quickGradingCheckbox() {
     const direct = document.querySelector(
-      'input[type="checkbox"][name="quickgrading"],input[type="checkbox"][id^="quickgrading"],input[type="checkbox"][id*="quickgrading"]'
+      'input[type="checkbox"][id^="quickgrading"],input[type="checkbox"][name="quickgrading"],input[type="checkbox"][id*="quickgrading"]'
     );
     if (direct) return direct;
     const label = [...document.querySelectorAll('label')]
@@ -55,95 +50,99 @@
     return label?.htmlFor ? document.getElementById(label.htmlFor) : null;
   }
 
+  function readiness() {
+    const table = document.querySelector('table#submissions,table[data-region="grading-table"]');
+    const root = table || document;
+    const checkbox = quickGradingCheckbox();
+    const grades = gradeInputs(root);
+    const feedbacks = feedbackInputs(root);
+    return {
+      table,
+      checkbox,
+      quickEnabled: !checkbox || checkbox.checked,
+      fields: grades.length + feedbacks.length,
+      ready: Boolean(table) && (!checkbox || checkbox.checked) && Boolean(grades.length || feedbacks.length)
+    };
+  }
+
   function findRows() {
-    const table = document.querySelector('#submissions, table[data-region="grading-table"]');
+    const table = document.querySelector('table#submissions,table[data-region="grading-table"]');
     if (!table) return [];
-    return [...table.querySelectorAll('tbody tr, tr[data-region="student-row"]')].map(row => {
+    return [...table.querySelectorAll('tbody tr,tr[data-region="student-row"]')].map(row => {
       const nameElement = row.querySelector(
-        'a.username, a[href*="/user/view.php"], a[href*="/user/profile.php"], td.user a, th.user a, [data-region="user-name"], .fullname'
+        'a.username,a[href*="/user/view.php"],a[href*="/user/profile.php"],td.user a,th.user a,[data-region="user-name"],.fullname'
       );
       const name = String(nameElement?.textContent || '').replace(/\s+/g, ' ').trim();
-      const grade = [...row.querySelectorAll(
-        'input.quickgrade[id^="quickgrade_"],input.quickgrade[name^="quickgrade_"],input[id^="quickgrade_"],input[name^="quickgrade_"]'
-      )].find(input => !/comments/i.test(`${input.id} ${input.name}`));
-      const feedback = row.querySelector(
-        'textarea.quickgrade[id^="quickgrade_comments_"],textarea.quickgrade[name^="quickgrade_comments_"],textarea[id^="quickgrade_comments_"],textarea[name^="quickgrade_comments_"]'
-      );
-      const submissionText = String(row.textContent || '').toLowerCase();
-      const hasSubmission = !submissionText.includes('nenhum envio') && !submissionText.includes('no submission');
+      const grade = gradeInputs(row)[0] || null;
+      const feedback = feedbackInputs(row)[0] || null;
+      const text = normalizeText(row.textContent);
+      const hasSubmission = !text.includes('nenhum envio') && !text.includes('no submission');
       return { row, name, grade, feedback, hasSubmission };
     }).filter(item => item.name && (item.grade || item.feedback));
   }
 
-  function quickGradingEnabled() {
-    const checkbox = quickGradingCheckbox();
-    return !checkbox || checkbox.checked;
+  function findGradeNavHost() {
+    const main = document.querySelector('[role="main"]') || document;
+    const links = [...main.querySelectorAll('.navitem a.btn,a.btn[href*="action=grader"],a.btn[href*="action=grading"]')];
+    const link = links.find(item => {
+      const text = normalizeText(item.textContent);
+      return text === 'nota' || text === 'grade' || item.href.includes('action=grader');
+    });
+    return link?.closest('.navitem') || document.querySelector('[data-region="grading-actions"],.tertiary-navigation .navitem:last-child');
   }
 
-  function showPageToast(message, tone = 'warning') {
+  function toast(message, tone = 'warning') {
     document.getElementById('sx-importer-toast')?.remove();
-    const toast = document.createElement('div');
-    toast.id = 'sx-importer-toast';
-    toast.className = `sx-importer-toast sx-reset is-${tone}`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 6000);
-  }
-
-  function detectDecimalSeparator() {
-    const values = findRows().map(item => item.grade?.value || '').join(' ');
-    if (/\d,\d/.test(values)) return ',';
-    const gradeText = [...document.querySelectorAll('td.grade,th.grade,td[class*="grade"],th[class*="grade"]')]
-      .map(cell => cell.textContent || '').join(' ');
-    return /\d,\d/.test(gradeText) ? ',' : '.';
-  }
-
-  function gradeForPage(value) {
-    let grade = String(value ?? '').trim().replace(/^['"]|['"]$/g, '').replace(/\s*\/\s*.+$/, '');
-    grade = grade.replace(/[^0-9,.-]/g, '');
-    if (!grade) return '';
-    const separator = detectDecimalSeparator();
-    if (separator === ',') {
-      if (grade.includes(',') && grade.includes('.')) grade = grade.replace(/\./g, '');
-      else if (grade.includes('.') && !grade.includes(',')) grade = grade.replace('.', ',');
-    } else {
-      if (grade.includes(',') && grade.includes('.')) grade = grade.replace(/,/g, '');
-      else if (grade.includes(',') && !grade.includes('.')) grade = grade.replace(',', '.');
-    }
-    return grade;
+    const element = document.createElement('div');
+    element.id = 'sx-importer-toast';
+    element.className = `sx-importer-toast sx-reset is-${tone}`;
+    element.textContent = message;
+    document.body.appendChild(element);
+    setTimeout(() => element.remove(), 6500);
   }
 
   function ensureButton() {
-    if (!pageSupported()) return;
+    if (!gradingPage()) return;
     let button = document.getElementById('sx-importer-open');
     if (!button) {
       button = document.createElement('button');
       button.id = 'sx-importer-open';
       button.type = 'button';
       button.className = 'sx-importer-open sx-button sx-reset';
-      button.textContent = 'Importar correções';
+      button.textContent = 'Importar';
       button.addEventListener('click', () => {
-        const checkbox = quickGradingCheckbox();
-        if (checkbox && !checkbox.checked) {
-          checkbox.click();
-          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-          showPageToast('A avaliação rápida foi ativada. Aguarde o Moodle atualizar os campos e clique novamente em Importar correções.');
+        const current = readiness();
+        if (current.checkbox && !current.checkbox.checked) {
+          current.checkbox.click();
+          current.checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          toast('A Avaliação rápida foi ativada. Aguarde a tabela atualizar e clique novamente em Importar.');
           return;
         }
-        const rows = findRows();
-        if (!rows.length) {
-          showPageToast('Os campos de nota e feedback ainda não estão disponíveis. Marque Avaliação rápida e aguarde a tabela carregar.');
+        if (!current.ready) {
+          toast('Os campos editáveis ainda não estão disponíveis. Confirme a Avaliação rápida e aguarde o carregamento da tabela.');
           return;
         }
         openModal();
       });
+    }
+
+    const host = findGradeNavHost();
+    if (host && button.parentElement !== host) {
+      button.classList.remove('sx-importer-floating');
+      host.appendChild(button);
+    } else if (!host && button.parentElement !== document.body) {
+      button.classList.add('sx-importer-floating');
+      document.body.appendChild(button);
+    } else if (!button.isConnected) {
+      button.classList.add('sx-importer-floating');
       document.body.appendChild(button);
     }
-    const rows = findRows();
-    button.dataset.ready = rows.length && quickGradingEnabled() ? 'true' : 'false';
-    button.title = rows.length
+
+    const current = readiness();
+    button.dataset.ready = current.ready ? 'true' : 'false';
+    button.title = current.ready
       ? 'Importar notas e feedbacks para a página atual'
-      : 'Clique para ativar ou aguardar a avaliação rápida';
+      : 'Ative a Avaliação rápida para carregar os campos editáveis';
   }
 
   function resetFlow() {
@@ -190,6 +189,12 @@
     render();
   }
 
+  function stepper(active) {
+    return `<div class="sx-importer-stepper">${['Adicionar', 'Validar', 'Executar'].map((label, index) =>
+      `<div class="${index + 1 <= active ? 'is-active' : ''}"><span>${index + 1}</span><b>${label}</b></div>`
+    ).join('')}</div>`;
+  }
+
   function render() {
     if (!state.modal) return;
     const content = state.modal.querySelector('.sx-importer-content');
@@ -199,17 +204,11 @@
     else renderExecution(content);
   }
 
-  function stepper(active) {
-    return `<div class="sx-importer-stepper">
-      ${['Adicionar', 'Validar', 'Executar'].map((label, index) => `<div class="${index + 1 <= active ? 'is-active' : ''}"><span>${index + 1}</span><b>${label}</b></div>`).join('')}
-    </div>`;
-  }
-
   function renderAdd(content) {
     content.innerHTML = `${stepper(1)}
       <section class="sx-importer-stage">
         <h3>Arquivo de correção</h3>
-        <p>Use CSV, TSV ou TXT com a coluna <b>nome</b> e ao menos uma coluna entre nota, feedback ou situação.</p>
+        <p>Use CSV, TSV ou TXT com a coluna <b>nome</b> e ao menos nota, feedback ou situação.</p>
         <label class="sx-importer-dropzone">
           <input type="file" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values">
           <span class="sx-importer-drop-icon">↥</span>
@@ -225,27 +224,24 @@
       <footer class="sx-importer-actions"><button type="button" class="sx-button sx-button--secondary" data-action="cancel">Cancelar</button><button type="button" class="sx-button" data-action="next" ${state.file ? '' : 'disabled'}>Validar arquivo</button></footer>`;
 
     const input = content.querySelector('input[type="file"]');
-    input.addEventListener('change', () => {
-      state.file = input.files?.[0] || null;
-      render();
-    });
-    content.querySelectorAll('[data-option]').forEach(inputOption => {
-      inputOption.addEventListener('change', () => {
-        state.settings.moodle[inputOption.dataset.option] = inputOption.checked;
-      });
-    });
+    input.addEventListener('change', () => { state.file = input.files?.[0] || null; render(); });
+    content.querySelectorAll('[data-option]').forEach(option => option.addEventListener('change', () => {
+      state.settings.moodle[option.dataset.option] = option.checked;
+    }));
     content.querySelector('[data-action="cancel"]').addEventListener('click', closeModal);
     content.querySelector('[data-action="next"]').addEventListener('click', validateFile);
+  }
+
+  function resolveColumn(headers, aliases) {
+    return headers.findIndex(header => aliases.some(alias => normalizeText(alias) === normalizeText(header)));
   }
 
   async function validateFile() {
     if (!state.file) return;
     try {
-      const text = await state.file.text();
-      const matrix = parseDelimited(text);
+      const matrix = parseDelimited(await state.file.text());
       if (matrix.length < 2) throw new Error('O arquivo não contém registros suficientes.');
-      const headers = matrix[0];
-      const indexes = Object.fromEntries(Object.entries(HEADER_ALIASES).map(([key, aliases]) => [key, resolveColumn(headers, aliases)]));
+      const indexes = Object.fromEntries(Object.entries(HEADER_ALIASES).map(([key, aliases]) => [key, resolveColumn(matrix[0], aliases)]));
       if (indexes.nome < 0) throw new Error('A coluna “nome” não foi encontrada.');
       if (indexes.nota < 0 && indexes.feedback < 0 && indexes.situacao < 0) throw new Error('Inclua nota, feedback ou situação.');
 
@@ -256,13 +252,13 @@
         situacao: indexes.situacao >= 0 ? columns[indexes.situacao] || '' : ''
       })).filter(record => record.nome && (record.nota || record.feedback || record.situacao));
 
-      const pageRows = findRows();
+      const rows = findRows();
       const used = new Set();
       state.matches = state.records.map(record => {
-        const normalized = normalizeText(record.nome);
-        let target = pageRows.find(item => !used.has(item) && normalizeText(item.name) === normalized);
+        const wanted = normalizeText(record.nome);
+        let target = rows.find(item => !used.has(item) && normalizeText(item.name) === wanted);
         if (!target && state.settings.moodle.flexibleNames) {
-          const candidates = pageRows.filter(item => !used.has(item))
+          const candidates = rows.filter(item => !used.has(item))
             .map(item => ({ item, score: similarity(record.nome, item.name) }))
             .sort((a, b) => b.score - a.score);
           if (candidates[0]?.score >= .82 && candidates[0].score > (candidates[1]?.score || 0) + .08) target = candidates[0].item;
@@ -273,18 +269,13 @@
       state.step = 2;
       render();
     } catch (error) {
-      showInlineError(error?.message || String(error));
+      const stage = state.modal?.querySelector('.sx-importer-stage');
+      stage?.querySelector('.sx-status')?.remove();
+      const status = document.createElement('div');
+      status.className = 'sx-status sx-status--danger';
+      status.textContent = error.message;
+      stage?.prepend(status);
     }
-  }
-
-  function showInlineError(message) {
-    const stage = state.modal?.querySelector('.sx-importer-stage');
-    if (!stage) return;
-    stage.querySelector('.sx-status')?.remove();
-    const status = document.createElement('div');
-    status.className = 'sx-status sx-status--danger';
-    status.textContent = message;
-    stage.prepend(status);
   }
 
   function renderValidation(content) {
@@ -295,44 +286,33 @@
         <h3>Validação do arquivo</h3>
         <div class="sx-importer-metrics"><span><b>${state.records.length}</b> Registros</span><span class="is-success"><b>${found.length}</b> Encontrados</span><span class="${missing.length ? 'is-warning' : 'is-success'}"><b>${missing.length}</b> Não encontrados</span></div>
         ${missing.length ? `<div class="sx-importer-list"><strong>Não encontrados</strong><ul>${missing.map(item => `<li>${escapeHtml(item.record.nome)}</li>`).join('')}</ul></div>` : '<div class="sx-status sx-status--success">Todos os registros foram localizados na página.</div>'}
-        <p class="sx-importer-note">Revise os nomes não encontrados antes de executar. Somente registros correspondentes serão preenchidos.</p>
       </section>
       <footer class="sx-importer-actions"><button type="button" class="sx-button sx-button--secondary" data-action="back">Voltar</button><button type="button" class="sx-button" data-action="execute" ${found.length ? '' : 'disabled'}>Executar preenchimento</button></footer>`;
     content.querySelector('[data-action="back"]').addEventListener('click', () => { state.step = 1; render(); });
     content.querySelector('[data-action="execute"]').addEventListener('click', executeImport);
   }
 
-  async function executeImport() {
-    state.step = 3;
-    render();
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    let applied = 0;
-    let skipped = 0;
-    const matched = state.matches.filter(item => item.target);
+  function pageDecimalSeparator() {
+    const values = gradeInputs().map(input => input.value || '').join(' ');
+    if (/\d,\d/.test(values)) return ',';
+    const cells = [...document.querySelectorAll('td.grade,th.grade,td[class*="grade"],th[class*="grade"]')]
+      .map(cell => cell.textContent || '').join(' ');
+    return /\d,\d/.test(cells) ? ',' : '.';
+  }
 
-    matched.forEach(({ record, target }) => {
-      let changed = false;
-      if (record.nota && target.grade) {
-        if (state.settings.moodle.overwriteGrades || !String(target.grade.value || '').trim()) {
-          setNativeValue(target.grade, gradeForPage(record.nota));
-          changed = true;
-        }
-      }
-      if (record.feedback && target.feedback) {
-        if (state.settings.moodle.overwriteFeedback || !String(target.feedback.value || '').trim()) {
-          setNativeValue(target.feedback, record.feedback);
-          changed = true;
-        }
-      }
-      if (record.situacao) applySituation(target.row, record.situacao);
-      if (changed || record.situacao) applied += 1;
-      else skipped += 1;
-    });
-
-    const result = state.modal?.querySelector('[data-execution-result]');
-    if (result) {
-      result.innerHTML = `<div class="sx-status sx-status--success"><b>Preenchimento concluído.</b><br>${applied} registro(s) aplicado(s) e ${skipped} ignorado(s). Revise os campos e use o botão nativo do Moodle para salvar.</div>`;
+  function gradeForPage(value) {
+    let grade = String(value ?? '').trim().replace(/^['"]|['"]$/g, '').replace(/\s*\/\s*.+$/, '');
+    grade = grade.replace(/[^0-9,.-]/g, '');
+    if (!grade) return '';
+    const separator = pageDecimalSeparator();
+    if (separator === ',') {
+      if (grade.includes(',') && grade.includes('.')) grade = grade.replace(/\./g, '');
+      else if (grade.includes('.') && !grade.includes(',')) grade = grade.replace('.', ',');
+    } else {
+      if (grade.includes(',') && grade.includes('.')) grade = grade.replace(/,/g, '');
+      else if (grade.includes(',') && !grade.includes('.')) grade = grade.replace(',', '.');
     }
+    return grade;
   }
 
   function applySituation(row, value) {
@@ -341,25 +321,44 @@
     const tag = document.createElement('span');
     tag.className = `sx-importer-tag ${normalized.includes('perigo') ? 'is-danger' : normalized.includes('aten') ? 'is-warning' : 'is-success'}`;
     tag.textContent = value;
-    const nameCell = row.querySelector('td.user, th.user, .username') || row.firstElementChild;
-    nameCell?.appendChild(tag);
+    const host = row.querySelector('td.user,th.user,.username') || row.firstElementChild;
+    host?.appendChild(tag);
+  }
+
+  async function executeImport() {
+    state.step = 3;
+    render();
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    let applied = 0;
+    let skipped = 0;
+    state.matches.filter(item => item.target).forEach(({ record, target }) => {
+      let changed = false;
+      if (record.nota && target.grade && (state.settings.moodle.overwriteGrades || !target.grade.value.trim())) {
+        setNativeValue(target.grade, gradeForPage(record.nota));
+        changed = true;
+      }
+      if (record.feedback && target.feedback && (state.settings.moodle.overwriteFeedback || !target.feedback.value.trim())) {
+        setNativeValue(target.feedback, record.feedback);
+        changed = true;
+      }
+      if (record.situacao) applySituation(target.row, record.situacao);
+      if (changed || record.situacao) applied += 1;
+      else skipped += 1;
+    });
+    const result = state.modal?.querySelector('[data-execution-result]');
+    if (result) result.innerHTML = `<div class="sx-status sx-status--success"><b>Preenchimento concluído.</b><br>${applied} registro(s) aplicado(s) e ${skipped} ignorado(s). Revise os campos e salve pelo Moodle.</div>`;
   }
 
   function renderExecution(content) {
     content.innerHTML = `${stepper(3)}
-      <section class="sx-importer-stage sx-importer-execution">
-        <div class="sx-importer-loader" aria-hidden="true"></div>
-        <h3>Executando preenchimento</h3>
-        <p>Aplicando os dados encontrados na página atual.</p>
-        <div data-execution-result></div>
-      </section>
+      <section class="sx-importer-stage sx-importer-execution"><div class="sx-importer-loader"></div><h3>Executando preenchimento</h3><p>Aplicando os dados encontrados na página atual.</p><div data-execution-result></div></section>
       <footer class="sx-importer-actions"><button type="button" class="sx-button" data-action="finish">Concluir</button></footer>`;
     content.querySelector('[data-action="finish"]').addEventListener('click', closeModal);
   }
 
   function renderBulk(content) {
     content.innerHTML = `<section class="sx-importer-stage sx-importer-bulk">
-      <h3>Aplicar em massa</h3><p>Use esta opção para preencher a mesma nota ou feedback em vários alunos da página atual.</p>
+      <h3>Aplicar em massa</h3><p>Preencha a mesma nota ou feedback nos alunos visíveis.</p>
       <label>Nota<input class="sx-field" type="text" data-bulk="grade" placeholder="Opcional"></label>
       <label>Feedback<textarea class="sx-field" data-bulk="feedback" rows="4" placeholder="Opcional"></textarea></label>
       <label>Aplicar em<select class="sx-field" data-bulk="scope"><option value="submissions">Somente alunos com envio</option><option value="all">Todos os alunos visíveis</option></select></label>
@@ -379,9 +378,16 @@
       }
       let applied = 0;
       findRows().filter(item => scope === 'all' || item.hasSubmission).forEach(item => {
-        if (grade && item.grade && (state.settings.moodle.overwriteGrades || !item.grade.value.trim())) setNativeValue(item.grade, gradeForPage(grade));
-        if (feedback && item.feedback && (state.settings.moodle.overwriteFeedback || !item.feedback.value.trim())) setNativeValue(item.feedback, feedback);
-        applied += 1;
+        let changed = false;
+        if (grade && item.grade && (state.settings.moodle.overwriteGrades || !item.grade.value.trim())) {
+          setNativeValue(item.grade, gradeForPage(grade));
+          changed = true;
+        }
+        if (feedback && item.feedback && (state.settings.moodle.overwriteFeedback || !item.feedback.value.trim())) {
+          setNativeValue(item.feedback, feedback);
+          changed = true;
+        }
+        if (changed) applied += 1;
       });
       status.className = 'sx-status sx-status--success';
       status.textContent = `${applied} aluno(s) preenchido(s). Revise e salve pelo Moodle.`;
@@ -389,12 +395,13 @@
   }
 
   async function initialize() {
-    if (!pageSupported()) return;
+    if (!gradingPage()) return;
     state.settings = await getSettings();
     if (!state.settings.modules.moodle || !state.settings.moodle.importer) return;
     ensureButton();
     const observer = new MutationObserver(() => ensureButton());
     observer.observe(document.body, { childList: true, subtree: true });
+    quickGradingCheckbox()?.addEventListener('change', () => setTimeout(ensureButton, 250));
   }
 
   initialize().catch(console.error);

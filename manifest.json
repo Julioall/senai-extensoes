@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SENAI Extensões",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Suíte modular de ferramentas para Moodle, Google Drive e Kahoot.",
   "permissions": [
     "activeTab",
@@ -31,11 +31,14 @@
       ],
       "js": [
         "shared/runtime.js",
-        "modules/moodle/importer/content.js"
+        "modules/moodle/importer/content-v2.js",
+        "modules/moodle/importer/ui-redesign.js"
       ],
       "css": [
         "shared/ui.css",
-        "modules/moodle/importer/content.css"
+        "modules/moodle/importer/content-v2.css",
+        "modules/moodle/importer/content.css",
+        "modules/moodle/importer/responsive-fix.css"
       ],
       "run_at": "document_idle"
     },
@@ -48,7 +51,7 @@
       ],
       "js": [
         "shared/runtime.js",
-        "modules/moodle/pending/content.js"
+        "modules/moodle/pending/content-v2.js"
       ],
       "css": [
         "shared/ui.css",
@@ -63,7 +66,7 @@
       ],
       "js": [
         "shared/runtime.js",
-        "modules/moodle/reports/content.js"
+        "modules/moodle/reports/content-v2.js"
       ],
       "css": [
         "shared/ui.css",
@@ -72,7 +75,9 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://drive.google.com/*"],
+      "matches": [
+        "https://drive.google.com/*"
+      ],
       "js": [
         "shared/runtime.js",
         "modules/drive-pdf/content.js"
@@ -84,14 +89,18 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://create.kahoot.it/*"],
+      "matches": [
+        "https://create.kahoot.it/*"
+      ],
       "js": [
         "shared/runtime.js",
-        "modules/kahoot/content.js"
+        "modules/kahoot/content.js",
+        "modules/kahoot/native-button.js"
       ],
       "css": [
         "shared/ui.css",
-        "modules/kahoot/content.css"
+        "modules/kahoot/content.css",
+        "modules/kahoot/responsive-fix.css"
       ],
       "run_at": "document_idle"
     }

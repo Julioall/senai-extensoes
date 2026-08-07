@@ -14,4 +14,8 @@
 .sx-pending-badge { min-width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; margin-left: 7px; padding: 0 6px; border-radius: 999px; background: #eef2f6; color: #687382; font-size: 10px; font-weight: 800; vertical-align: middle; }
 .sx-pending-badge.is-danger { background: #dc3545; color: white; }
 .sx-pending-badge.is-success { background: #e8f7ee; color: #157347; }
+.sx-pending-course-badge { display: inline-flex !important; align-items: center !important; min-height: 24px !important; margin: 6px 0 4px 8px !important; padding: 3px 9px !important; border-radius: 999px !important; background: #eef2f6 !important; color: #687382 !important; font-size: 10px !important; font-weight: 800 !important; line-height: 1.2 !important; vertical-align: middle !important; }
+.sx-pending-course-badge.is-danger { background: #dc3545 !important; color: #fff !important; }
+.sx-pending-course-badge.is-success { background: #e8f7ee !important; color: #157347 !important; }
+.sx-pending-course-badge.is-future { background: #f1f3f5 !important; color: #6c757d !important; }
 @media (max-width: 760px) { .sx-pending-head { align-items: flex-start; flex-wrap: wrap; } .sx-pending-actions { width: 100%; } .sx-pending-actions .sx-button { flex: 1; } }

@@ -1,0 +1,212 @@
+/* Mantém o importador compacto sem depender do zoom do navegador. */
+.sx-importer-overlay {
+  align-items: center !important;
+  padding: 16px !important;
+  overflow: auto !important;
+}
+
+.sx-importer-modal {
+  width: min(700px, calc(100vw - 32px)) !important;
+  max-height: min(760px, calc(100dvh - 32px)) !important;
+  border-radius: 14px !important;
+}
+
+.sx-importer-header {
+  padding: 18px 20px 13px !important;
+}
+
+.sx-importer-header > div:first-child {
+  grid-template-columns: 42px 1fr !important;
+  column-gap: 11px !important;
+}
+
+.sx-importer-header > div:first-child::before {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 10px !important;
+  font-size: 25px !important;
+}
+
+.sx-importer-header h2 {
+  font-size: 18px !important;
+}
+
+.sx-importer-header p {
+  margin-top: 2px !important;
+  font-size: 11px !important;
+}
+
+.sx-importer-tabs {
+  margin: -40px 60px 10px auto !important;
+}
+
+.sx-importer-tabs button {
+  min-height: 29px !important;
+  padding: 0 9px !important;
+  font-size: 9px !important;
+}
+
+.sx-importer-content {
+  padding: 0 18px 16px !important;
+}
+
+.sx-importer-stepper {
+  gap: 10px !important;
+  padding: 15px 16px !important;
+}
+
+.sx-importer-stepper div {
+  gap: 7px !important;
+  font-size: 11px !important;
+}
+
+.sx-importer-stepper div:not(:last-child)::after {
+  left: calc(50% + 42px) !important;
+  right: calc(-50% + 42px) !important;
+}
+
+.sx-importer-stepper span {
+  width: 28px !important;
+  height: 28px !important;
+  font-size: 11px !important;
+}
+
+.sx-importer-stage {
+  padding: 16px !important;
+}
+
+.sx-importer-stage h3 {
+  font-size: 13px !important;
+}
+
+.sx-importer-stage > p {
+  font-size: 11px !important;
+}
+
+.sx-importer-dropzone {
+  min-height: 185px !important;
+  margin-top: 12px !important;
+  gap: 7px !important;
+}
+
+.sx-importer-drop-icon {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.sx-importer-drop-icon::before {
+  width: 33px !important;
+  height: 38px !important;
+}
+
+.sx-importer-dropzone strong {
+  font-size: 15px !important;
+}
+
+.sx-importer-dropzone small {
+  font-size: 11px !important;
+}
+
+.sx-importer-options {
+  margin-top: 12px !important;
+  padding: 11px 13px !important;
+}
+
+.sx-importer-options label {
+  min-height: 32px !important;
+}
+
+.sx-importer-actions {
+  padding-top: 13px !important;
+}
+
+.sx-importer-actions .sx-button {
+  min-height: 36px !important;
+  padding: 0 15px !important;
+  font-size: 12px !important;
+}
+
+.sx-importer-metrics {
+  gap: 8px !important;
+  margin-top: 12px !important;
+}
+
+.sx-importer-metrics span {
+  min-height: 66px !important;
+  padding: 9px !important;
+  font-size: 11px !important;
+}
+
+.sx-importer-metrics b {
+  font-size: 19px !important;
+}
+
+.sx-importer-list {
+  max-height: 185px !important;
+  margin-top: 12px !important;
+  padding: 11px 13px !important;
+}
+
+.sx-importer-list li {
+  min-height: 33px !important;
+  font-size: 11px !important;
+}
+
+.sx-importer-file-summary {
+  min-height: 62px !important;
+  margin-bottom: 12px !important;
+  padding: 10px 13px !important;
+}
+
+.sx-importer-loader {
+  width: 46px !important;
+  height: 46px !important;
+  margin: 8px auto 13px !important;
+  border-width: 4px !important;
+}
+
+@media (max-height: 760px) {
+  .sx-importer-modal {
+    max-height: calc(100dvh - 20px) !important;
+  }
+
+  .sx-importer-header {
+    padding-block: 13px 10px !important;
+  }
+
+  .sx-importer-tabs {
+    margin-top: -35px !important;
+  }
+
+  .sx-importer-stepper {
+    padding-block: 11px !important;
+  }
+
+  .sx-importer-stage {
+    padding: 13px !important;
+  }
+
+  .sx-importer-dropzone {
+    min-height: 145px !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .sx-importer-overlay {
+    padding: 8px !important;
+  }
+
+  .sx-importer-modal {
+    width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
+
+  .sx-importer-tabs {
+    position: static !important;
+    margin: 0 18px 8px auto !important;
+  }
+
+  .sx-importer-stepper b {
+    display: none !important;
+  }
+}
